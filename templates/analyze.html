@@ -1,0 +1,31 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 mt-4">
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                    {% if errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <h5 class="alert-heading">Error!</h4>
+                        {%- for msg in errors %}
+                        {{ msg }}
+                        {% endfor -%}
+                    </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="col-md-12">
+                <div class="mt-4">
+                    <form action="/search" method="post">
+                        <label for="exampleFormControlTextarea1" class="form-label">Escribe tus indicadores de compromiso</label>
+                        <textarea name="note" class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+                        <br>
+                        <button class="mt-2 btn btn-dark" type="submit"><i class="fas fa-search"></i>&nbsp; Buscar</button>
+                    </form>
+                  </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

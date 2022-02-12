@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-8">
+                <form method="POST" action="/save-config">
+                        <h4>API KEY</h3>
+                        <hr>
+                        <div class="mb-3">
+                            <label for="api_key_vt" class="form-label">Virus Total</label>
+                            <input id="api_key_vt" type="text" value="{{ data['user_config']['API_KEY'] }}" name="api_key_vt" class="form-control"aria-describedby="basic-addon1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="api_key_abuseip" class="form-label">Abuse IP</label>
+                            <input id="api_key_abuseip" type="text" name="api_key_abuseip" value="{{ data['user_config']['API_KEY_ABUSEIP'] }}"  class="form-control" aria-describedby="basic-addon1">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-save"></i> &nbsp; Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}

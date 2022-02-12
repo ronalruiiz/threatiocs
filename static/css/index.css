@@ -1,0 +1,27 @@
+.btn-secondary{
+    background-color: #f7f7f9 !important;
+    color: black !important;
+}
+
+table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before, table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control:before {
+    top: 50% !important;
+    left: 5px !important;
+    height: 1em !important;
+    width: 1em !important;
+    margin-top: -9px !important;
+    margin-right: 4px;
+    padding: 2px !important;
+    border: none !important;
+    box-shadow: none;
+    border-radius: 20% !important;
+    display: block !important;
+    position: absolute !important;
+    color: white !important;
+    box-sizing: content-box !important;
+    text-align: center !important;
+    text-indent: 0 !important;
+    font-family: "Courier New",Courier,monospace !important;
+    line-height: 1em !important;
+    content: "+" !important;
+    background-color: #363636 !important;
+}
