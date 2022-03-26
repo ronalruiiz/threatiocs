@@ -6,7 +6,6 @@ from Services import IOCService
 from Services import ThreatIOCService
 from flask_caching import Cache
 
-
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
@@ -29,15 +28,17 @@ def home():
         iocs = cache.get("iocs")
     
     if request.method == "POST":
-        data = {}
+        malwares = {}
         for ioc in iocs:
-            if (not ioc.name in data and len(data)<5):
-                data[ioc.name] = 1
-            elif(ioc.name in data):
-                data[ioc.name] = data[ioc.name]+1
-        return jsonify(data=[s.toDict() for s in iocs], chartjs=data)
+            if (not ioc.name in malwares):
+                malwares[ioc.name] = 1
+            elif(ioc.name in malwares):
+                malwares[ioc.name] = malwares[ioc.name]+1
+        malwares = dict(sorted(malwares.items(),key=lambda x: x[1],reverse=True))
+        malwares = dict(list(malwares.items())[:5])
+        return jsonify(data=[s.toDict() for s in iocs], chartjs=malwares)
 
-    return render_template('index.html',data=iocs)
+    return render_template('index.html')
 
 
 
@@ -68,23 +69,25 @@ def saveconfig():
         return resp
 
 
-@app.route('/search',methods=['POST'])
+@app.route('/search',methods=["POST"])
 def search():
-    iocs_textarea = request.form["note"]
-    iocs = []
-    user_config = request.cookies.get('userConfig')
+    if request.method == "POST":
+        iocs_textarea = request.form["note"]
+        iocs = []
+        user_config = request.cookies.get('userConfig')
 
-    if user_config == None:
-        flash('No se encuentran definidas las API KEY - Ir a la página de configuración', 'error')
-        return  redirect('analyze')
+        if user_config == None:
+            return jsonify(data=[],status="error")
 
-    user_config = SecureCookie.unserialize(user_config,"Admin123456789.")
+        user_config = SecureCookie.unserialize(user_config,"Admin123456789.")
+        ioc_lines = iocs_textarea.split("\n")
+        for index,x in enumerate(ioc_lines):
+            if len(x) > 2:
+                ioc = IOCService(user_config).getIOC(x,index)
+                iocs.append(ioc)
+        return jsonify(data=[s.toDict() for s in iocs],status="success")
+    return redirect('analyze') 
 
-    ioc_lines = iocs_textarea.split("\n")
-    for index,x in enumerate(ioc_lines):
-        if len(x) > 2:
-            ioc = IOCService(user_config).getIOC(x,index)
-            iocs.append(ioc)
-    return render_template('search.html',data=iocs)
+
 
     
