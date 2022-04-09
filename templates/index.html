@@ -11,31 +11,8 @@
                 <div class="col-md-5">
                     <canvas id="myChart" width="400" height="400"></canvas>
                 </div>
-                <div class="col-md-6">
-                    <table class="table" style="max-width: 100%;" width="100%">
-                        <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">CVE</th>
-                            <th scope="col">Solution</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</th>
-                                <td>CVE-2022-23280</td>
-                                <td>Microsoft Outlook</td>
-                                <td>12/01/2022</td>
-                            </tr>
-                            <tr>
-                                <td>2</th>
-                                <td>CVE-2022-23274</td>
-                                <td>Microsoft Dynamics</td>
-                                <td>12/01/2022</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="col-md-5">
+                    <canvas id="myChartCountry" width="300" height="300"></canvas>
                 </div>
             </div>
             <div class="row mt-4">
@@ -108,22 +85,22 @@
         var _data;
         var _labels;
         const ctx = document.getElementById('myChart').getContext('2d');
-        
+        const country = document.getElementById('myChartCountry').getContext('2d');
         $.ajax({
             url: "/",
             type: "POST",
             success: function(response) {
                 full_data = response;
-                _data = Object.values(full_data.chartjs)
-                _labels = Object.keys(full_data.chartjs)
+                console.log(full_data.chartjs.countries)
+                console.log(full_data.chartjs.malwares)
 
                 const myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: _labels,
+                        labels: Object.keys(full_data.chartjs.malwares),
                         datasets: [{
-                            label: '# IOC´s',
-                            data: _data,
+                            label: '# Malware´s',
+                            data: Object.values(full_data.chartjs.malwares),
                             backgroundColor: [
                                 'rgba(21, 21, 21, 1)',
                                 'rgba(85, 85, 85, 1)',
@@ -141,7 +118,33 @@
                         }
                     }
                 });
+
+                const myChartCountry = new Chart(country, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(full_data.chartjs.countries),
+                        datasets: [{
+                            label: '# Countries',
+                            data: Object.values(full_data.chartjs.countries),
+                            backgroundColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)',
+                                'rgb(255, 205, 86)',
+                                'rgb(12, 21, 86)',
+                                'rgb(122, 21, 86)'
+                            ],
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
             },
         });
+    
     </script>
 {% endblock %}

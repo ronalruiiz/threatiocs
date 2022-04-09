@@ -230,7 +230,10 @@ def transform_country_code(country_code):
         'YU': 'Yugoslavia',
         'ZR': 'Zaire',
         'ZM': 'Zambia',
-        'ZW': 'Zimbabwe'
+        'ZW': 'Zimbabwe',
     }
-
-    return country[country_code]
+    
+    if country_code in country:
+        return country[country_code]
+    else:
+        return "Unkown"

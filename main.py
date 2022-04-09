@@ -29,14 +29,25 @@ def home():
     
     if request.method == "POST":
         malwares = {}
+        countries = {}
         for ioc in iocs:
+            if (not ioc.country in countries and ioc.country != "Unkown"):
+                countries[ioc.country] = 1
+            elif(ioc.country in countries):
+                countries[ioc.country] = countries[ioc.country]+1
+
             if (not ioc.name in malwares):
                 malwares[ioc.name] = 1
             elif(ioc.name in malwares):
                 malwares[ioc.name] = malwares[ioc.name]+1
+
         malwares = dict(sorted(malwares.items(),key=lambda x: x[1],reverse=True))
         malwares = dict(list(malwares.items())[:5])
-        return jsonify(data=[s.toDict() for s in iocs], chartjs=malwares)
+
+        countries = dict(sorted(countries.items(),key=lambda x: x[1],reverse=True))
+        countries = dict(list(countries.items())[:5])
+
+        return jsonify(data=[s.toDict() for s in iocs], chartjs={"malwares":malwares,"countries":countries})
 
     return render_template('index.html')
 
