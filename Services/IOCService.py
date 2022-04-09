@@ -8,7 +8,11 @@ class IOCService:
     def __init__(self,user_config):
         self.headers = {"vtotal":{'x-apikey' : user_config['API_KEY']},
         "abuseip":{'Accept': 'application/json','Key': user_config['API_KEY_ABUSEIP']}}
-        self.regex_rules = {'domain':r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$','ip':r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}','hash':''}
+        self.regex_rules = {
+            'domain':r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$',
+            "domain_http":r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)",
+            'ip':r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}',
+            'hash':''}
 
     def abuseIP(self,ip):
         url = 'https://api.abuseipdb.com/api/v2/check'
@@ -70,7 +74,7 @@ class IOCService:
         url = "https://www.virustotal.com/api/v3/search?query="+x.strip()
         response = requests.get(url, headers=self.headers['vtotal'])
         ioc = Ioc(str(index),x.strip())
-        if re.search(self.regex_rules['domain'],x.lower()):
+        if re.search(self.regex_rules['domain'],x.lower()) or re.search(self.regex_rules['domain_http'],x.lower()):
             if len(response.json()['data']) > 0:
                 data_all = response.json()['data'][0]
                 self.domain(data_all,ioc)
