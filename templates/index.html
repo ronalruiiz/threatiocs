@@ -1,0 +1,191 @@
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.11.3/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/r-2.2.9/sc-2.0.5/datatables.min.css" />
+<link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}">
+{% endblock %}
+
+{% block title %}Dashboard{% endblock %}</h1>
+
+{% block content %}
+<div class="row">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4 col-xl-3">
+                <div class="card card-c bg-c-blue order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Hashes</h6>
+                        <h2 class="text-right"><i class="fa fa-cart-plus f-left"></i><span> &nbsp; {{range(100, 349) | random}}</span></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 col-xl-3">
+                <div class="card card-c bg-c-green order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Direcciones IP</h6>
+                        <h2 class="text-right"><i class="fa-solid fa-globe"></i><span></span>&nbsp;{{range(100, 500) | random}}</span></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 col-xl-3">
+                <div class="card card-c bg-c-yellow order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Dominios</h6>
+                        <h2 class="text-right"><i class="fa fa-refresh f-left"></i><span>&nbsp;{{range(100, 800) | random}}</span></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 col-xl-3">
+                <div class="card card-c bg-c-pink order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">URL's</h6>
+                        <h2 class="text-right"><i class="fa-solid fa-browser"></i><span>&nbsp;{{range(100, 1000) | random}}</span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="row mt-4 mb-4 justify-content-between">
+            <div class="col-md-5">
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+            <div class="col-md-5">
+                <canvas id="myChartCountry" width="300" height="300"></canvas>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <table id="iocs" class="table" style="max-width: 100%;" width="100%">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Value</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Reputation</th>
+                        <th>Detection</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script type="text/javascript"
+    src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.11.3/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/r-2.2.9/sc-2.0.5/datatables.min.js"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#iocs').DataTable({
+            dom: 'Bfrtip',
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                {
+                    "width": "250px", "targets": 1, render: function (data, type, full, meta) {
+                        return '<p class="text-break">' + data + '</p>';
+                    },
+                }
+            ],
+            "columns": [
+                { "data": "item" },
+                { "data": "value" },
+                { "data": "name" },
+                { "data": "type" },
+                { "data": "reputation" },
+                { "data": "detection" },
+            ],
+            buttons: [
+                'copy', 'csv', 'excel',
+                {
+                    extend: 'colvis',
+                    text: 'Columnas',
+                }
+            ],
+            "ajax": {
+                "url": "/",
+                "type": "POST"
+            },
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+    })
+</script>
+
+<script>
+    var _data;
+    var _labels;
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const country = document.getElementById('myChartCountry').getContext('2d');
+    $.ajax({
+        url: "/",
+        type: "POST",
+        success: function (response) {
+            full_data = response;
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(full_data.chartjs.malwares),
+                    datasets: [{
+                        label: '# Malware´s',
+                        data: Object.values(full_data.chartjs.malwares),
+                        backgroundColor: [
+                            'rgba(21, 21, 21, 1)',
+                            'rgba(85, 85, 85, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                        ],
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const myChartCountry = new Chart(country, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(full_data.chartjs.countries),
+                    datasets: [{
+                        label: '# Countries',
+                        data: Object.values(full_data.chartjs.countries),
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 205, 86)',
+                            'rgb(12, 21, 86)',
+                            'rgb(122, 21, 86)'
+                        ],
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        },
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}">
+{% endblock %}
+
+{% block title %}IP Lookup{% endblock %}</h1>
+
+{% block content %}
+<div class="container">
+    <form method="POST" action="/iplookup">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-md-4">
+                <input id="dir_ip" placeholder="Escribe la dirección IP" type="text" name="dir_ip" value="{{value.ipinfo.query if value else ''}}"
+                    class="form-control" aria-describedby="basic-addon1">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> &nbsp; Buscar</button>
+            </div>
+        </div>
+    </form>
+    {% if value %}
+    <div class="row justify-content-center">
+        <div class="col-md-6 mt-5">
+            <div class="card">
+                <div class="card-header">
+                    Result of : <strong>{{value.ipinfo.query}}</strong>
+                </div>
+                <ul class="list-group list-group-flush" style="max-width: 100%;">
+                    <li class="list-group-item">Country: {{value.ipinfo.country}}</li>
+                    <li class="list-group-item">ISP: {{value.ipinfo.isp}}</li>
+                    <li class="list-group-item">ORG: {{value.ipinfo.org}}</li>
+                    <li class="list-group-item">Reverse DNS: {{value.ipinfo.reverse}}</li>
+                    <li class="list-group-item">VPN: {{value.vpn}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {%endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+{% endblock %}

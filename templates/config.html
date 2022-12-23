@@ -1,0 +1,144 @@
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/configuration.css')}}">
+{% endblock %}
+
+{% block title %}Configuration{% endblock %}</h1>
+
+{% block content %}
+
+<div class="row">
+    <nav class="nav-sidebar col-md-3 col-lg-2 p-0">
+        <nav class="nav flex-column" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <li class="nav-link active mt-4" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home"
+                type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">
+                <i class="fa-solid fa-key"></i>
+                API Keys Owner
+            </li>
+            <li class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile"
+                type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Product Systems
+            </li>
+        </nav>
+    </nav>
+
+    <div class="col-md-9 ms-sm-auto col-lg-10 px-5">
+        <form method="POST" class="tab-content mt-4" action="/save-config">
+            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                <div class="form-group mb-3">
+                    <label for="api_key_vt" class="form-label">Virus Total</label>
+                    <input id="api_key_vt" type="text" value="{{ data['user_config']['API_KEY'] }}" name="api_key_vt"
+                        class="form-control" aria-describedby="basic-addon1">
+                    <div id="emailHelp" class="form-text">Para información de como generar el API Key de Virus Total <a target="_blank"
+                            href="https://support.virustotal.com/hc/en-us/articles/115002100149-API">click aqui</a>.
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="api_key_abuseip" class="form-label">Abuse IP</label>
+                    <input id="api_key_abuseip" type="text" name="api_key_abuseip"
+                        value="{{ data['user_config']['API_KEY_ABUSEIP'] }}" class="form-control"
+                        aria-describedby="basic-addon1">
+                    <div id="emailHelp" class="form-text">Para información de como generar el API Key de Abuse IP <a target="_blank"
+                            href="https://www.abuseipdb.com/account/api">click aqui</a>.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary my-2"><i class="fas fa-save"></i> &nbsp;
+                    Guardar</button>
+            </div>
+            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+
+                <div class="input-group mb-3">
+                    <input id="cpe" placeholder="Agregar los CPE's" type="text"
+                        value="" name="cpe" class="form-control"
+                        aria-describedby="basic-addon1">
+                    <button class="btn btn-primary" type="button" id="button-addon1"><i
+                            class="fa-solid fa-plus"></i></button>
+                </div>
+
+                <button type="submit" class="btn btn-primary my-2"><i class="fas fa-save"></i> &nbsp;
+                    Guardar</button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- <div class="row justify-content-between mt-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header py-3">
+                Configuration Options
+            </div>
+            <div class="card-body">
+                <nav class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <li class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home"
+                        aria-selected="true">
+                        <i class="fa-solid fa-key"></i>
+                        API Keys
+                    </li>
+                    <li class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile"
+                        aria-selected="false">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        Sistemas
+                    </li>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <form method="POST" class="tab-content" action="/save-config">
+            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                <div class="card">
+                    <div class="card-header py-3">
+                        Configuration API Keys
+                    </div>
+                    <div class="card-body px-5 py-4" id="v-pills-tabContent">
+                        <div class="form-group mb-3">
+                            <label for="api_key_vt" class="form-label">Virus Total</label>
+                            <input id="api_key_vt" type="text" value="{{ data['user_config']['API_KEY'] }}"
+                                name="api_key_vt" class="form-control" aria-describedby="basic-addon1">
+                            <div id="emailHelp" class="form-text">Para información de como generar el API Key de Virus Total <a href="https://support.virustotal.com/hc/en-us/articles/115002100149-API">click aqui</a>.</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="api_key_abuseip" class="form-label">Abuse IP</label>
+                            <input id="api_key_abuseip" type="text" name="api_key_abuseip"
+                                value="{{ data['user_config']['API_KEY_ABUSEIP'] }}" class="form-control"
+                                aria-describedby="basic-addon1">
+                                <div id="emailHelp" class="form-text">Para información de como generar el API Key de Abuse IP <a href="https://www.abuseipdb.com/account/api">click aqui</a>.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary my-2"><i class="fas fa-save"></i> &nbsp;
+                            Guardar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                <div class="card">
+                    <div class="card-header">
+                        Configuration Systems
+                    </div>
+                    <div class="card-body px-5 py-4" id="v-pills-tabContent">
+                        <div class="input-group mb-3">
+                            <input id="api_key_vt" placeholder="Agregar los CPE's" type="text" value="{{ data['user_config']['API_KEY'] }}"
+                                name="api_key_vt" class="form-control" aria-describedby="basic-addon1">
+                                <button class="btn btn-primary" type="button" id="button-addon1"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary my-2"><i class="fas fa-save"></i> &nbsp;
+                            Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div> -->
+{% endblock %}
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+{% endblock %}
