@@ -1,17 +1,20 @@
 from flask import Flask, render_template,request,redirect,make_response,jsonify
 from secure_cookie.cookie import SecureCookie
-from services import IOCService
-from services import ThreatIOCService
+from services import IOCService,ThreatIOCService,HeaderService,VulnerabilityService
 from flask_caching import Cache
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 import dns.resolver
+from datetime import datetime,timedelta
+from helpers.contex_processors import register_context_processors
+
 
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+register_context_processors(app)
 
 #Caching Flask
 config = {
@@ -128,16 +131,9 @@ def iplookup():
         
         return render_template('iplookup.html', value={"ipinfo":response.json(),"vpn":result_vpn})
 
-#Route for Vulnerabilities
+#DNS Records
 
-@app.route('/vulnerabilities',methods=['POST','GET'])
-def vulnerabilities():
-    if request.method == 'GET':
-        return  render_template('vulnerability.html')
-
-#Route DNS Records
-
-@app.route('/dns/security-records',methods=['POST','GET'])
+@app.route('/email/security-records',methods=['POST','GET'])
 def security_records():
     if request.method == 'GET':
         return  render_template('security_record.html')
@@ -168,3 +164,33 @@ def security_records():
         pass
 
         return render_template('security_record.html', value=response,record=record)   
+
+#Route DNS Records
+
+@app.route('/email/analyze-header',methods=['POST','GET'])
+def analyze_header():
+    if request.method == 'GET':
+        return  render_template('header_analyzer.html')
+    if request.method == 'POST':
+        mail_data = request.form['headers'].strip()
+        response = HeaderService().get_analyze(mail_data)
+
+        print(response)
+        return render_template('header_analyzer.html',data=response['data'], delayed=response['delayed'], summary=response['summary'],
+            n=response['n'], security_headers=response['security_headers'])
+
+#Route for Vulnerabilities
+
+@app.route('/vulnerabilities',methods=['POST','GET'])
+def vulnerabilities():
+    if request.method == 'POST':
+        print("")
+        # date_end = datetime.now()
+        # date_init = date_end - timedelta(days=30)
+        # #date_init = request.form['date_init']
+        # #date_end = request.form['date_end']
+
+        # response = VulnerabilityService().get_vulnerabilities(date_init,date_end)
+        # return jsonify(response)
+    if request.method == 'GET':
+        return  render_template('vulnerability.html')

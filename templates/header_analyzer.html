@@ -1,0 +1,168 @@
+{% extends 'layout.html' %} {% block css %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.11.3/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/r-2.2.9/sc-2.0.5/datatables.min.css"
+/>
+<link href="{{url_for('static', filename='css/flag-sprites.min.css')}}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}" />
+{% endblock %} {% block title %}Analyze IOC's{% endblock %} {% block content %}
+<div class="container-fluid" style="padding-top: 50px">
+    {% if data %}
+    <div class="well well-lg">
+        <div class="row" style="padding-top: 15px;">
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>Subject</dt>
+                    <dd>{{ summary.Subject }}</dd>
+                    <dt>Message-ID</dt>
+                    <dd>{{ summary.MessageID }}</dd>
+                    <dt>Creation time (Date)</dt>
+                    <dd>{{ summary.Date }}</dd>
+                    <dt>From</dt>
+                    <dd>{{ summary.From }}</dd>
+                    <dt>To</dt>
+                    <dd>{{ summary.To }}</dd>
+                    {% if summary.Cc %}
+                    <dt>Cc</dt>
+                    <dd>{{ summary.Cc }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+            {% if delayed %}
+            <div class="col-md-6">
+                {# <div id="chart_div"></div>#}
+                {{ chart|safe }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <table class="table table-hover" id="table" data-toggle="table" data-search="true" data-show-columns="true" data-striped="true"
+        data-show-toggle="true" data-show-refresh="true" data-page-size="13" data-sort-name="hop"
+        data-sort-order="asc">
+        <thead>
+            <tr>
+                <th data-field="hop" data-sortable="true">Hop</th>
+                <th data-sortable="true">From</th>
+                <th data-sortable="true">By</th>
+                <th data-sortable="true">With</th>
+                <th data-sortable="true">Time (UTC)</th>
+                <th data-sortable="true">Delay</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k, v in data.items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v.Direction.0 }}{% if country(v.Direction.0).iso_code %}<span class="pull-right"><a href="#"
+                            data-toggle="tooltip" data-placement="top"
+                            title="{{country(v.Direction.0).country_name}}"><i
+                                class="flag flag-{{country(v.Direction.0).iso_code}}"></i></a></span>{% endif %}
+                </td>
+                <td>{{ v.Direction.1 }}{% if country(v.Direction.1).iso_code %}<span class="pull-right"><a href="#"
+                            data-toggle="tooltip" data-placement="top"
+                            title="{{country(v.Direction.1).country_name}}"><i
+                                class="flag flag-{{country(v.Direction.1).iso_code}}"></i></a></span>{% endif %}
+                </td>
+                <td>{{ v.Direction.2 }}</td>
+                <td>{{ v.Time }}</td>
+                <td>
+                    {% if duration(v.Delay) %} {{ duration(v.Delay) }} {% else %} {% if loop.first %} *
+                    {% else %}0{% endif %} {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="panel panel-default" style="margin-top: 10px;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <h3 class="panel-title">Security Headers</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                {% for k,v in n.items() %}
+                {% if k in security_headers %}
+                <tr>
+                    <th>{{ k }}</th>
+                    <td>{{ v }}</td>
+                </tr>
+                {% endif %} {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-default" style="margin-top: 10px;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <h3 class="panel-title">X- headers</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                {% for k,v in n.items() %}
+                {% if k.startswith('X-') %}
+                <tr>
+                    <th>{{ k }}</th>
+                    <td>{{ v }}</td>
+                </tr>
+                {% endif %} {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-default text-wrap" style="max-width: 100%;margin-top: 10px;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <h3 class="panel-title">Other headers</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" style="width: 100%;">
+                
+                {% for k,v in n.items() %}
+                {% if k not in ['Received','Subject','From','To','Message-ID','CC','Date'] and k not in security_headers and not k.startswith('X-') %}
+                <tr>
+                    <th>{{ k }}</th>
+                    <td class="text-break">{{ v }}</td>
+                </tr>
+                {% endif %} {% endfor %}
+            </table>
+        </div>
+    </div>
+  {% else %}
+  <div class="row">
+    <div class="col-md-12">
+      <form method="POST" >
+        <label for="note" class="form-label"
+          >Escribe la cabecera del correo</label
+        >
+        <textarea
+          name="headers"
+          class="form-control"
+          rows="12"
+          placeholder=""
+          autofocus
+          required
+        ></textarea>
+        <br />
+        <button class="mt-2 btn btn-primary" type="submit">
+          <i class="fas fa-search"></i>&nbsp; Analizar
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.11.3/b-2.0.1/b-colvis-2.0.1/b-html5-2.0.1/r-2.2.9/sc-2.0.5/datatables.min.js"></script>
+    <script type="text/javascript">
+         window.addEventListener('DOMContentLoaded', function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+{% endblock %}

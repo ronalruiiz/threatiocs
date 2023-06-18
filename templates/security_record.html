@@ -3,11 +3,11 @@
 <link rel="stylesheet" href="{{ url_for('static',filename='css/index.css')}}">
 {% endblock %}
 
-{% block title %}IP Lookup{% endblock %}</h1>
+{% block title %}Security Record {% endblock %}
 
 {% block content %}
 <div class="container">
-    <form method="POST" action="/dns/security-records">
+    <form method="POST" action="/email/security-records">
         <div class="row mt-5 justify-content-center">
             <div class="col-md-4">
                 <input id="domain" placeholder="Escribe el Dominio" type="text" name="domain"
