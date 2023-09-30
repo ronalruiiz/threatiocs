@@ -9,12 +9,16 @@ import os
 import dns.resolver
 from datetime import datetime,timedelta
 from helpers.contex_processors import register_context_processors
+from flask_cors import CORS
 
 
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 register_context_processors(app)
+
+# Configura CORS para permitir todas las solicitudes desde cualquier origen
+CORS(app)
 
 #Caching Flask
 config = {
@@ -135,6 +139,38 @@ def iplookup():
 
 @app.route('/email/security-records',methods=['POST','GET'])
 def security_records():
+
+    if request.method == 'GET' and request.headers.get('X-Api-Request') == "true":
+
+        domain = request.args.get('domain', "")
+        record = request.args.get('record', "")
+        selector = request.args.get('selector', "")
+
+        print(domain,record,selector)
+
+        response = {"data":""}
+        try:
+            if record == "SPF":
+                test = dns.resolver.resolve(domain , 'TXT')
+                query = 'spf1'
+
+            if record == "DMARC":
+                test = dns.resolver.resolve('_dmarc.' + domain , 'TXT')
+                query = 'DMARC1'
+
+            if record == "DKIM":
+                test = dns.resolver.resolve(selector + '._domainkey.' + domain , 'TXT')
+                query = 'DKIM1'
+                
+            for dns_data in test:
+                if query in str(dns_data):
+                    response = {"data":str(dns_data),"selector":selector,"query":domain}
+        except:
+            response = {"data":"[FAIL] record not found.","domain":domain}
+        pass
+
+        return jsonify(response)
+    
     if request.method == 'GET':
         return  render_template('security_record.html')
     if request.method == 'POST':
@@ -163,7 +199,8 @@ def security_records():
             response = {"result":"[FAIL] record not found.","domain":domain}
         pass
 
-        return render_template('security_record.html', value=response,record=record)   
+        return render_template('security_record.html', value=response,record=record)
+
 
 #Route DNS Records
 
