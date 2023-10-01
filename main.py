@@ -18,7 +18,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 register_context_processors(app)
 
 # Configura CORS para permitir todas las solicitudes desde cualquier origen
-CORS(app)
+cors = CORS(app, resources={r"/email/security-records": {"origins": ["https://threatiocs.naanbits.com","http://localhost:8080"]}})
 
 #Caching Flask
 config = {
@@ -164,9 +164,9 @@ def security_records():
                 
             for dns_data in test:
                 if query in str(dns_data):
-                    response = {"data":str(dns_data),"selector":selector,"query":domain}
+                    response = {"record":str(dns_data),"selector":selector,"query":domain}
         except:
-            response = {"data":"[FAIL] record not found.","domain":domain}
+            response = {"record":"[FAIL] record not found.","domain":domain}
         pass
 
         return jsonify(response)
