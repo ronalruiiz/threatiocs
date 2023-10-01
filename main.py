@@ -39,10 +39,25 @@ def home():
     else:
         iocs = cache.get("iocs")
     
+    count_hashes = 0
+    count_urls = 0
+    count_domains = 0
+    count_ips = 0
+
     if request.method == "POST":
         malwares = {}
         countries = {}
         for ioc in iocs:
+
+            if ioc.type == "domain":
+                count_domains+=1
+            if ioc.type == "url":
+                count_urls+=1
+            if ioc.type.find("ip"):
+                count_ips+=1
+            if ioc.type.find("hash"):
+                count_hashes+=1
+
             if (not ioc.country in countries and ioc.country != "Unkown"):
                 countries[ioc.country] = 1
             elif(ioc.country in countries):
@@ -59,7 +74,9 @@ def home():
         countries = dict(sorted(countries.items(),key=lambda x: x[1],reverse=True))
         countries = dict(list(countries.items())[:5])
 
-        return jsonify(data=[s.to_dict() for s in iocs], chartjs={"malwares":malwares,"countries":countries})
+
+
+        return jsonify(data=[s.to_dict() for s in iocs], chartjs={"malwares":malwares,"countries":countries}, report={"domains":count_domains,"urls":count_urls,"ips":count_ips,"hashes":count_hashes})
 
     return render_template('index.html')
 
@@ -121,7 +138,7 @@ def iplookup():
         return  render_template('iplookup.html')
     if request.method == 'POST':
         dir_ip = request.form["dir_ip"]
-        url = 'http://ip-api.com/json/'+dir_ip+'?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,currency,isp,org,as,asname,reverse,hosting,query'
+        url = 'http://ip-api.com/json/'+dir_ip.strip()+'?fields=message,continent,country,countryCode,regionName,city,lat,lon,timezone,currency,isp,org,as,asname,hosting'
         response = requests.get(url)
         response_spur = requests.get("https://spur.us/context/"+dir_ip)
         soup = BeautifulSoup(response_spur.text, 'lxml')
