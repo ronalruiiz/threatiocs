@@ -1,3 +1,12 @@
+import socket
+
+def obtener_ip(dominio):
+    try:
+        direccion_ip = socket.gethostbyname(dominio)
+        return direccion_ip
+    except socket.gaierror:
+        return "No se pudo resolver la dirección IP."
+
 def transform_country_code(country_code):    
     country = {
         'US': 'United States',

@@ -12,7 +12,7 @@
     <form method="POST" action="/iplookup">
         <div class="row mt-5 justify-content-center">
             <div class="col-md-4">
-                <input id="dir_ip" placeholder="Escribe la dirección IP" type="text" name="dir_ip" value="{{value.ipinfo.query if value else ''}}"
+                <input id="dir_ip" placeholder="Escribe la dirección IP" type="text" name="dir_ip" value="{{value.query if value else ''}}"
                     class="form-control" aria-describedby="basic-addon1">
             </div>
             <div class="col-auto">
@@ -25,12 +25,13 @@
         <div class="col-md-6 mt-5">
             <div class="card">
                 <div class="card-header">
-                    Result of : <strong>{{value.ipinfo.query}}</strong>
+                    Result of : <strong>{{value.query}}</strong>
                 </div>
                 <ul class="list-group list-group-flush" style="max-width: 100%;">
                     {% for key, value in value.ipinfo.items() %}
                         <li class="list-group-item">{{key}}: {{value}}</li>
                     {% endfor %}
+                    <li class="list-group-item">IP: {{value.ip}}</li>
                     <li class="list-group-item">VPN: {{value.vpn}}</li>
                 </ul>
             </div>

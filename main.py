@@ -9,8 +9,8 @@ import os
 import dns.resolver
 from datetime import datetime,timedelta
 from helpers.contex_processors import register_context_processors
+from helpers.ip import obtener_ip
 from flask_cors import CORS
-
 
 load_dotenv()
 app = Flask(__name__)
@@ -138,7 +138,7 @@ def iplookup():
         return  render_template('iplookup.html')
     if request.method == 'POST':
         dir_ip = request.form["dir_ip"]
-        url = 'http://ip-api.com/json/'+dir_ip.strip()+'?fields=message,continent,country,countryCode,regionName,city,lat,lon,timezone,currency,isp,org,as,asname,hosting'
+        url = 'http://ip-api.com/json/'+dir_ip.strip()+'?fields=message,continent,country,countryCode,regionName,city,lat,lon,timezone,currency,isp,org,asname,hosting'
         response = requests.get(url)
         response_spur = requests.get("https://spur.us/context/"+dir_ip)
         soup = BeautifulSoup(response_spur.text, 'lxml')
@@ -150,7 +150,7 @@ def iplookup():
         if vpn != None:
             result_vpn = vpn.get_text().strip()
         
-        return render_template('iplookup.html', value={"ipinfo":response.json(),"vpn":result_vpn})
+        return render_template('iplookup.html', value={"ipinfo":response.json(),"ip":obtener_ip(dir_ip),"vpn":result_vpn,"query":dir_ip})
 
 #DNS Records
 
