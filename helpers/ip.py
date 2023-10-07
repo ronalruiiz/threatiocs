@@ -1,4 +1,5 @@
 import socket
+import re
 
 def obtener_ip(dominio):
     try:
@@ -6,6 +7,9 @@ def obtener_ip(dominio):
         return direccion_ip
     except socket.gaierror:
         return "No se pudo resolver la dirección IP."
+
+def sanatize_ioc(ioc):
+    return re.sub(r'[()\[\]]', '', ioc)
 
 def transform_country_code(country_code):    
     country = {

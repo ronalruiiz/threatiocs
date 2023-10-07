@@ -31,6 +31,12 @@
                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> &nbsp; Buscar</button>
             </div>
         </div>
+        <!-- <div class="row justify-content-center">
+            <div class="col-md-4 mt-4" id="alldkim">
+                <input type="checkbox" name="alldkim"/>
+                Todos los selectores
+            </div>
+        </div> -->
     </form>
     {% if value %}
     <div class="row justify-content-center">
@@ -50,21 +56,28 @@
 {% block script %}
 <script>
     let dkim = document.getElementById("dkim")
+    let dkimSelect = document.getElementById("alldkim")
+
     dkim.style.display = "none";
+    dkimSelect.style.display = "none";
 
     let record = document.getElementById("record")
     
     if (record.value =="DKIM"){
-            document.getElementById("dkim").style.display = "block";
-        }else{
-            dkim.style.display = "none";
+        dkim.style.display = "block";
+        dkimSelect.style.display = "block";
+    }else{
+        dkim.style.display = "none";
+        dkimSelect.style.display = "none";
     }
 
     function elementShowDKIM(element){
         if (element.value =="DKIM"){
-            document.getElementById("dkim").style.display = "block";
+            dkim.style.display = "block";
+            dkimSelect.style.display = "block";
         }else{
             dkim.style.display = "none";
+            dkimSelect.style.display = "none";
         }
     }
     

@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,make_response,jsonify
+from flask import Flask, render_template,request,redirect,make_response,jsonify,Response
 from secure_cookie.cookie import SecureCookie
 from services import IOCService,ThreatIOCService,HeaderService,VulnerabilityService
 from flask_caching import Cache
@@ -9,16 +9,15 @@ import os
 import dns.resolver
 from datetime import datetime,timedelta
 from helpers.contex_processors import register_context_processors
-from helpers.ip import obtener_ip
-from flask_cors import CORS
+from helpers.ip import obtener_ip, sanatize_ioc
+from selenium import webdriver
+
+
 
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 register_context_processors(app)
-
-# Configura CORS para permitir todas las solicitudes desde cualquier origen
-cors = CORS(app, resources={r"/email/security-records": {"origins": ["https://threatiocs.naanbits.com","http://localhost:8080"]}})
 
 #Caching Flask
 config = {
@@ -100,7 +99,7 @@ def search():
         ioc_lines = iocs_textarea.split("\n")
         for index,x in enumerate(ioc_lines):
             if len(x) > 2:
-                ioc = IOCService(user_config).get_ioc(x,index,epp)
+                ioc = IOCService(user_config).get_ioc(sanatize_ioc(x),index,epp)
                 iocs.append(ioc)
         return jsonify(data=[s.to_dict() for s in iocs],status="success")
     return redirect('analyze') 
@@ -137,7 +136,7 @@ def iplookup():
     if request.method == 'GET':
         return  render_template('iplookup.html')
     if request.method == 'POST':
-        dir_ip = request.form["dir_ip"]
+        dir_ip = sanatize_ioc(request.form["dir_ip"])
         url = 'http://ip-api.com/json/'+dir_ip.strip()+'?fields=message,continent,country,countryCode,regionName,city,lat,lon,timezone,currency,isp,org,asname,hosting'
         response = requests.get(url)
         response_spur = requests.get("https://spur.us/context/"+dir_ip)
@@ -153,48 +152,16 @@ def iplookup():
         return render_template('iplookup.html', value={"ipinfo":response.json(),"ip":obtener_ip(dir_ip),"vpn":result_vpn,"query":dir_ip})
 
 #DNS Records
-
 @app.route('/email/security-records',methods=['POST','GET'])
 def security_records():
 
-    if request.method == 'GET' and request.headers.get('X-Api-Request') == "true":
-
-        domain = request.args.get('domain', "")
-        record = request.args.get('record', "")
-        selector = request.args.get('selector', "")
-
-        print(domain,record,selector)
-
-        response = {"data":""}
-        try:
-            if record == "SPF":
-                test = dns.resolver.resolve(domain , 'TXT')
-                query = 'spf1'
-
-            if record == "DMARC":
-                test = dns.resolver.resolve('_dmarc.' + domain , 'TXT')
-                query = 'DMARC1'
-
-            if record == "DKIM":
-                test = dns.resolver.resolve(selector + '._domainkey.' + domain , 'TXT')
-                query = 'DKIM1'
-                
-            for dns_data in test:
-                if query in str(dns_data):
-                    response = {"record":str(dns_data),"selector":selector,"query":domain}
-        except:
-            response = {"record":"[FAIL] record not found.","domain":domain}
-        pass
-
-        return jsonify(response)
-    
     if request.method == 'GET':
         return  render_template('security_record.html')
     if request.method == 'POST':
         domain = request.form["domain"]
         record = request.form["record"]
         selector = request.form["selector"]
-
+        data = None
         response = {"result":""}
         try:
             if record == "SPF":
@@ -211,7 +178,8 @@ def security_records():
                 
             for dns_data in test:
                 if query in str(dns_data):
-                    response = {"result":dns_data,"selector":selector,"domain":domain}
+                    data = dns_data
+                    response = {"result":data,"selector":selector,"domain":domain}           
         except:
             response = {"result":"[FAIL] record not found.","domain":domain}
         pass
@@ -248,3 +216,13 @@ def vulnerabilities():
         # return jsonify(response)
     if request.method == 'GET':
         return  render_template('vulnerability.html')
+    
+
+#Route for Viewer Page
+
+@app.route('/viewer-page',methods=['POST','GET'])
+def viewerPage():
+    if request.method == 'POST':
+        print("hola")
+    if request.method == 'GET':
+        return  render_template('viewer_page.html')
