@@ -10,7 +10,6 @@ import dns.resolver
 from datetime import datetime,timedelta
 from helpers.contex_processors import register_context_processors
 from helpers.ip import obtener_ip, sanatize_ioc
-from selenium import webdriver
 
 
 
