@@ -244,7 +244,7 @@ def viewerPage():
             screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
             return render_template('viewer_page.html', screenshot_base64=screenshot_base64,query=url)
         except Exception as e:
-            return render_template('viewer_page.html', error="Error al obtener la imagen {e}")
+            return render_template('viewer_page.html', error=f"Error al obtener la imagen {e}")
         
     if request.method == 'GET':
         return  render_template('viewer_page.html')
