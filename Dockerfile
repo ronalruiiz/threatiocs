@@ -7,6 +7,8 @@ WORKDIR /app
 # Copia el archivo de requerimientos al contenedor
 COPY requirements.txt .
 
+USER root
+
 # Instala las dependencias de la aplicación
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,7 +19,8 @@ RUN pip install gunicorn
 COPY . .
 
 # Establece el usuario como root
-USER root
+
+RUN pip install --upgrade selenium
 
 # Expone el puerto en el que la aplicación Flask se ejecutará (generalmente el puerto 5000)
 EXPOSE 8080
