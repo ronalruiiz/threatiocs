@@ -1,8 +1,8 @@
 # Utiliza una imagen base de Python
-FROM python:3.7-slim
+FROM python:3.7
 
 # Establece el directorio de trabajo en /app
-WORKDIR /
+WORKDIR /app
 
 # Copia el archivo de requerimientos al contenedor
 COPY requirements.txt .
