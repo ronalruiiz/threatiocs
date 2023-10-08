@@ -22,5 +22,5 @@ USER root
 # Expone el puerto en el que la aplicación Flask se ejecutará (generalmente el puerto 5000)
 EXPOSE 8080
 
-# Comando para iniciar la aplicación con Gunicorn, leyendo el Procfile
-CMD ["gunicorn", "--bind=0.0.0.0:8080", "--timeout 4000","wsgi:app"]
+# Comando para iniciar la aplicación con Gunicorn
+CMD gunicorn wsgi:app --bind=0.0.0.0:8080 --timeout 4000
