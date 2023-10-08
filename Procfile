@@ -1,1 +1,1 @@
-web: wsgi:app --timeout 4000
+wsgi:app --timeout 4000
