@@ -23,4 +23,4 @@ USER root
 EXPOSE 8080
 
 # Comando para iniciar la aplicación con Gunicorn, leyendo el Procfile
-CMD ["sh", "-c", "gunicorn $(cat Procfile)"]
+CMD ["gunicorn", "--workers=4", "--bind=0.0.0.0:8080", "--timeout 4000","wsgi:app"]
