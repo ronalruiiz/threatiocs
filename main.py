@@ -1,16 +1,17 @@
 from flask import Flask, render_template,request,redirect,make_response,jsonify,Response
 from secure_cookie.cookie import SecureCookie
-from services import IOCService,ThreatIOCService,HeaderService,VulnerabilityService
+from services import IOCService,ThreatIOCService,HeaderService
 from flask_caching import Cache
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 import dns.resolver
-from datetime import datetime,timedelta
 from helpers.contex_processors import register_context_processors
 from helpers.ip import obtener_ip, sanatize_ioc
-
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import base64
 
 
 load_dotenv()
@@ -130,10 +131,10 @@ def saveconfig():
 
 #Route for IP Info
 
-@app.route('/iplookup',methods=['POST','GET'])
+@app.route('/lookup',methods=['POST','GET'])
 def iplookup():
     if request.method == 'GET':
-        return  render_template('iplookup.html')
+        return  render_template('lookup.html')
     if request.method == 'POST':
         dir_ip = sanatize_ioc(request.form["dir_ip"])
         url = 'http://ip-api.com/json/'+dir_ip.strip()+'?fields=message,continent,country,countryCode,regionName,city,lat,lon,timezone,currency,isp,org,asname,hosting'
@@ -219,9 +220,31 @@ def vulnerabilities():
 
 #Route for Viewer Page
 
+def capture_screenshot(url):
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')  # Agrega esta línea para evitar problemas con GPUs
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get(url)
+
+    # Capturar la captura de pantalla como bytes en memoria
+    screenshot_bytes = driver.get_screenshot_as_png()
+    
+    driver.quit()
+
+    return screenshot_bytes
+
 @app.route('/viewer-page',methods=['POST','GET'])
 def viewerPage():
     if request.method == 'POST':
-        print("hola")
+        url = request.form['url']
+        try:
+            screenshot_bytes = capture_screenshot(url)
+            screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
+            return render_template('viewer_page.html', screenshot_base64=screenshot_base64,query=url)
+        except:
+            return render_template('viewer_page.html', error="Error al obtener la imagen")
+        
     if request.method == 'GET':
         return  render_template('viewer_page.html')

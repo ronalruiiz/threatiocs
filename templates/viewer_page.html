@@ -9,20 +9,31 @@
 
 {% block content %}
 <div class="container-fluid">
-    <form method="POST" action="/iplookup">
+    
+    <form method="POST" action="/viewer-page">
         <div class="row mt-5 justify-content-center">
             <div class="col-md-4">
-                <input id="dir_ip" placeholder="Escribe la dirección IP" type="text" name="dir_ip" value="{{value.query if value else ''}}"
+                <input id="dir_ip" placeholder="Escribe la URL" type="text" name="url" value="{{query if query else ''}}"
                     class="form-control" aria-describedby="basic-addon1">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> &nbsp; Buscar</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> &nbsp; Capturar</button>
             </div>
         </div>
     </form>
-    {% if value %}
-        <img id="screenshot" src="" alt="Captura de Pantalla">
-    {%endif %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <!-- Mostrar la imagen capturada con un identificador único -->
+        <h4>Imagen Obtenida:</h2>
+            {%if screenshot_base64%}
+                <img src="data:image/png;base64,{{ screenshot_base64 }}" alt="Captura de pantalla">
+            {% endif %}
+
+            {%if error%}
+                {{error}}
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% endblock %}
