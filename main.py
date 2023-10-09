@@ -145,11 +145,11 @@ def iplookup():
         result_vpn = "None"
         
         if response == None:
-            return render_template('iplookup.html', value={"value":""})
+            return render_template('lookup.html', value={"value":""})
         if vpn != None:
             result_vpn = vpn.get_text().strip()
         
-        return render_template('iplookup.html', value={"ipinfo":response.json(),"ip":obtener_ip(dir_ip),"vpn":result_vpn,"query":dir_ip})
+        return render_template('lookup.html', value={"ipinfo":response.json(),"ip":obtener_ip(dir_ip),"vpn":result_vpn,"query":dir_ip})
 
 #DNS Records
 @app.route('/email/security-records',methods=['POST','GET'])
