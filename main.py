@@ -142,12 +142,13 @@ def iplookup():
         response_spur = requests.get("https://spur.us/context/"+dir_ip)
         soup = BeautifulSoup(response_spur.text, 'lxml')
         h2_tag = soup.find('h2', class_='mb-3 text-left')
-        vpn = h2_tag.find('span').get_text(strip=True)
+        vpn = h2_tag.find('span')
         result_vpn = "None"
         
         if response == None:
             return render_template('lookup.html', value={"value":""})
         if vpn != None:
+            vpn = vpn.get_text(strip=True)
             result_vpn = vpn
         
         return render_template('lookup.html', value={"ipinfo":response.json(),"ip":obtener_ip(dir_ip),"vpn":result_vpn,"query":dir_ip})
