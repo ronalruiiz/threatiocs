@@ -77,14 +77,18 @@ class IOCService:
         response = requests.get(url, headers=self.headers['vtotal'])
         ioc = Ioc(str(index),input.strip())
         
-        if len(response.json()['data']) > 0:
-            data = response.json()['data'][0]
-            if re.search(regex_rules['domain'],input.lower()) or re.search(regex_rules['url'],input.lower()):
-                self.domain(data,ioc)
-            elif re.search(regex_rules['ip'],input.lower()): 
-                self.ip(data,ioc)
-            else:
-                ioc.type = "Hash"+": "+detect_hash(ioc.value)
-                self.hash(data,ioc,epp)
+        try:
+            if len(response.json()['data']) > 0:
+                data = response.json()['data'][0]
                 
+                if re.search(regex_rules['domain'],input.lower()) or re.search(regex_rules['url'],input.lower()):
+                    self.domain(data,ioc)
+                elif re.search(regex_rules['ip'],input.lower()): 
+                    self.ip(data,ioc)
+                else:
+                    ioc.type = "Hash"+": "+detect_hash(ioc.value)
+                    self.hash(data,ioc,epp)
+        except :
+            ioc.other_value = "Error al buscar el IOC"
+
         return ioc
